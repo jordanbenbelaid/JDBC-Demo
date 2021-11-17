@@ -2,8 +2,11 @@ package com.qa.setup;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,12 +54,11 @@ public class SetUp {
 
 	//CREATE STATEMENT
 	public void create(Kitten kitten) {
-//    	Connection conn = null;
     	try(Connection conn = DriverManager.getConnection(jdbcConnectionURL, username, password); 
     			Statement statement = conn.createStatement()) {
     				statement.executeUpdate("INSERT INTO kitten(age, breed, cuteness, name) VALUES(" + kitten.getAge() + ",'"
     						+ kitten.getBreed() + "'," + kitten.getCuteness() + ",'" + kitten.getName() + "')");
-     		
+     		System.out.println(readAll());
     	}catch(SQLException e) {
     		LOGGER.error(e.getMessage());
     	}
@@ -65,12 +67,62 @@ public class SetUp {
 	//CREATE PREPARED STATEMENT
 	
 	//RESULTSET
+	public Kitten kittenFromResultSet(ResultSet resultSet) throws SQLException{
+		int kittenId = resultSet.getInt("id");
+		int age = resultSet.getInt("age");
+		String breed = resultSet.getString("breed");
+		int cuteness = resultSet.getInt("cuteness");
+		String name = resultSet.getString("name");
+		
+		return new Kitten(kittenId, age, breed, cuteness, name);
+	}
+	//READ BY ID STATEMENT
+	public Kitten readById(int id) {
+		try(Connection conn = DriverManager.getConnection(jdbcConnectionURL, username, password); 
+    			Statement statement = conn.createStatement(); 
+			ResultSet resultSet = statement.executeQuery("SELECT * FROM kitten WHERE id = " + id)) {
+			resultSet.next();
+			return kittenFromResultSet(resultSet);
+			
+		}catch(SQLException e) {
+			LOGGER.error(e.getMessage());
+		}
+		return null;
+	}
 	
-	//READ STATEMENT
+	//READ ALL STATEMENT
+	public List<Kitten> readAll(){
+		try(Connection conn = DriverManager.getConnection(jdbcConnectionURL, username, password); 
+    			Statement statement = conn.createStatement(); 
+			ResultSet resultSet = statement.executeQuery("SELECT * FROM kitten")) {
+			
+			List<Kitten> kittens = new ArrayList<>();
+			while(resultSet.next()) {
+				kittens.add(kittenFromResultSet(resultSet));
+			}
+			return kittens;
+			
+		}catch(SQLException e) {
+			LOGGER.error(e.getMessage());
+		}
+		return null;
+	}
+	
 	
 	//READ PREPARED STATEMENT
 	
 	//UPDATE STATEMENT
+	public void update(Kitten kitten, int id) {
+		try(Connection conn = DriverManager.getConnection(jdbcConnectionURL, username, password); 
+    			Statement statement = conn.createStatement()) {
+			statement.executeUpdate("UPDATE kitten SET age = " + kitten.getAge() + ", breed = '" + kitten.getBreed() + "', cuteness = "
+					+ kitten.getCuteness() + ", name = '" + kitten.getName() + "' WHERE id = " + id);
+			System.out.println(readById(id));
+		}catch(SQLException e) {
+			LOGGER.error(e.getMessage());
+		}
+		
+	}
 	
 	//UPDATE PREPARED STATEMENT
 	
