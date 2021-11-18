@@ -2,6 +2,7 @@ package com.qa.setup;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -65,6 +66,20 @@ public class SetUp {
     }
 	
 	//CREATE PREPARED STATEMENT
+	public void createPrepared(Kitten kitten) {
+		try(Connection conn = DriverManager.getConnection(jdbcConnectionURL, username, password);
+				PreparedStatement statement = conn.prepareStatement(
+						"INSERT INTO kitten(age, breed, cuteness, name) VALUES (?,?,?,?)")) {
+			statement.setInt(1, kitten.getAge());
+			statement.setString(2, kitten.getBreed());
+			statement.setInt(3, kitten.getCuteness());
+			statement.setString(4, kitten.getName());
+			statement.executeUpdate();
+			
+		}catch (SQLException e) {
+			LOGGER.error(e.getMessage());
+		}
+	}
 	
 	//RESULTSET
 	public Kitten kittenFromResultSet(ResultSet resultSet) throws SQLException{
