@@ -105,6 +105,22 @@ public class SetUp {
 		return null;
 	}
 	
+	//READ BY ID PREPARED STATEMENT
+	public Kitten readByIdPrepared(int id) {
+		try(Connection conn = DriverManager.getConnection(jdbcConnectionURL, username, password);
+				PreparedStatement statement = conn.prepareStatement("SELECT * FROM kitten WHERE id = ?")){
+			statement.setInt(1, id);
+
+			ResultSet resultSet = statement.executeQuery();
+			resultSet.next();
+			return kittenFromResultSet(resultSet);
+
+		}catch(SQLException e) {
+			LOGGER.error(e.getMessage());
+		}
+		return null;
+	}
+	
 	//READ LATEST STATEMENT
 	public Kitten readLatest() {
 		try(Connection conn = DriverManager.getConnection(jdbcConnectionURL, username, password); 
@@ -137,8 +153,6 @@ public class SetUp {
 	}
 	
 	
-	//READ PREPARED STATEMENT
-	
 	//UPDATE STATEMENT
 	public void update(Kitten kitten, int id) {
 		try(Connection conn = DriverManager.getConnection(jdbcConnectionURL, username, password); 
@@ -153,6 +167,23 @@ public class SetUp {
 	}
 	
 	//UPDATE PREPARED STATEMENT
+	public void updatePrepared(Kitten kitten, int id) {
+		try(Connection conn = DriverManager.getConnection(jdbcConnectionURL, username, password);
+				PreparedStatement statement = conn.prepareStatement(
+						"UPDATE kitten SET age = ?, breed = ?, cuteness = ?, name = ? WHERE id = ?")){
+			statement.setInt(1,  kitten.getAge());
+			statement.setString(2, kitten.getBreed());
+			statement.setInt(3,  kitten.getCuteness());
+			statement.setString(4, kitten.getName());
+			statement.setInt(5, id);
+			statement.executeUpdate();
+			
+			System.out.println(readByIdPrepared(id));
+			
+		}catch(SQLException e) {
+			LOGGER.error(e.getMessage());
+		}
+	}
 	
 	//DELETE STATEMENT
 	public void delete(int id) {
@@ -166,7 +197,19 @@ public class SetUp {
 	}
 	
 	//DELETE PREPARED STATEMENT
-	
+	public void deletePrepared(int id) {
+		try(Connection conn = DriverManager.getConnection(jdbcConnectionURL, username, password);
+				PreparedStatement statement = conn.prepareStatement(
+						"DELETE FROM kitten WHERE id = ?")){
+			
+			statement.setInt(1, id);
+			statement.executeUpdate();
+			
+			System.out.println("The id: " + id + "has been deleted!");
+		}catch(SQLException e) {
+			LOGGER.error(e.getMessage());
+		}
+	}
 	
 
 }

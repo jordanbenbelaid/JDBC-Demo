@@ -15,7 +15,7 @@ public class Runner {
 		
 		Kitten k = new Kitten(13, "Tiger", 9, "King");
 		
-		setup.createPrepared(kittenUpdate);
+//		setup.createPrepared(kittenUpdate);
 //		setup.delete(5);
 //		setup.update(k, 1);
 		
@@ -24,6 +24,8 @@ public class Runner {
 //		System.out.println(setup.readAll());
 		
 //		System.out.println(setup.readLatest());
+		
+		System.out.println(setup.readByIdPrepared(10));
 		
 		
 	}
