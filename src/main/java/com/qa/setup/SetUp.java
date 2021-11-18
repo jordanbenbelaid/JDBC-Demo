@@ -58,7 +58,7 @@ public class SetUp {
     			Statement statement = conn.createStatement()) {
     				statement.executeUpdate("INSERT INTO kitten(age, breed, cuteness, name) VALUES(" + kitten.getAge() + ",'"
     						+ kitten.getBreed() + "'," + kitten.getCuteness() + ",'" + kitten.getName() + "')");
-     		System.out.println(readAll());
+     		System.out.println(readLatest());
     	}catch(SQLException e) {
     		LOGGER.error(e.getMessage());
     	}
@@ -87,6 +87,19 @@ public class SetUp {
 		}catch(SQLException e) {
 			LOGGER.error(e.getMessage());
 		}
+		return null;
+	}
+	
+	//READ LATEST STATEMENT
+	public Kitten readLatest() {
+		try(Connection conn = DriverManager.getConnection(jdbcConnectionURL, username, password); 
+    			Statement statement = conn.createStatement();
+				ResultSet resultSet = statement.executeQuery("SELECT * FROM kitten ORDER BY id DESC LIMIT 1");){
+					resultSet.next();
+					return kittenFromResultSet(resultSet);
+				}catch(SQLException e) {
+					LOGGER.error(e.getMessage());
+				}
 		return null;
 	}
 	
